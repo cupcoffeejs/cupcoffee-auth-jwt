@@ -1,6 +1,6 @@
 {
   "name": "cupcoffee-auth-jwt",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "JWT authentication to CupcoffeeJs",
   "main": "index.js",
   "scripts": {
