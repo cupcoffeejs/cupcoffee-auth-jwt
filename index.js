@@ -6,8 +6,10 @@ require('dotenv').config();
 
 module.exports = (secret = false) => {
 
-    var validateFunction = () => {
-        return false;
+    var validateFunctionSync = null;
+
+    var validateFunction = (next) => {
+        next(false);
     }
 
     var successFunction = ({next}) => {
@@ -51,6 +53,11 @@ module.exports = (secret = false) => {
         return this;
     }
 
+    this.validateSync = (callback) => {
+        validateFunctionSync = callback
+        return this;
+    };
+
     this.validate = (callback) => {
         validateFunction = callback
         return this;
@@ -69,17 +76,23 @@ module.exports = (secret = false) => {
             return;
         }
 
-        var dbUserObj = validateFunction(username, password);
-
-        if (dbUserObj) {
-            return res.json(genToken(dbUserObj));
-        } else {
-            res.status(401);
-            return res.json({
-                "status": 401,
-                "message": "Invalid credentials"
-            });
+        var dbUserObj = (result) => {
+            if (result) {
+                return res.json(genToken(result));
+            } else {
+                res.status(401);
+                return res.json({
+                    "status": 401,
+                    "message": "Invalid credentials"
+                });
+            }
         }
+
+        if(validateFunctionSync){
+            return dbUserObj(validateFunctionSync(username, password))
+        }
+
+        validateFunction(username, password, dbUserObj);
     }
 
     this.middware = (path, success) => {
