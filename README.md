@@ -37,8 +37,10 @@ var cupJwt = require('cupcoffee-auth-jwt')()
 
 module.exports = ({router, controller}) => {
 
-    router.post('/login', cupJwt.validate((user, pass) => {
+    router.post('/login', cupJwt.validate((user, pass, next) => {
         //.. User authentication, return false or data user
+        var result = { email: "user@email.com"}
+        next(result)
     }).login);
 
     router.get('/api/*', (req, res) => {
